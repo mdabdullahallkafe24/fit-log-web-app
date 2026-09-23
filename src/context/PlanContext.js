@@ -9,7 +9,6 @@ export function PlanProvider({ children }) {
   const [planList, setPlanList] = useState([]);
   const [savedList, setSavedList] = useState([]);
 
-  // Today's Plan-এ যুক্ত করার লজিক
   const addToPlan = (workout) => {
     const isAlreadyInPlan = planList.some((item) => item.id === workout.id);
 
@@ -28,7 +27,6 @@ export function PlanProvider({ children }) {
     });
   };
 
-  // Save for later-এ যুক্ত করার লজিক
   const saveForLater = (workout) => {
     const isAlreadySaved = savedList.some((item) => item.id === workout.id);
 
@@ -47,7 +45,6 @@ export function PlanProvider({ children }) {
     });
   };
 
-  // Plan থেকে রিমুভ করার লজিক
   const removeFromPlan = (id) => {
     setPlanList((prev) => prev.filter((item) => item.id !== id));
     toast.info("Removed from plan", {
@@ -56,7 +53,6 @@ export function PlanProvider({ children }) {
     });
   };
 
-  // Saved থেকে রিমুভ করার লজিক
   const removeFromSaved = (id) => {
     setSavedList((prev) => prev.filter((item) => item.id !== id));
     toast.info("Removed from saved list", {
