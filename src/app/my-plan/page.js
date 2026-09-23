@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePlan } from "@/context/PlanContext";
 import { FiTrash2, FiArrowLeft, FiCheckCircle, FiBookmark } from "react-icons/fi";
 
@@ -22,12 +23,12 @@ export default function MyPlan() {
       <section className="space-y-6">
         <div className="flex items-center gap-2">
           <FiCheckCircle className="text-primary text-2xl" />
-          <h2 className="text-2xl font-bold text-white">Today's Plan ({planList.length})</h2>
+          <h2 className="text-2xl font-bold text-white">Today&apos;s Plan ({planList.length})</h2>
         </div>
 
         {planList.length === 0 ? (
           <div className="bg-base-200/50 border border-dashed border-base-100/20 rounded-2xl p-8 text-center space-y-3">
-            <p className="text-slate-400">No workouts added to today's plan yet.</p>
+            <p className="text-slate-400">No workouts added to today&apos;s plan yet.</p>
             <Link href="/" className="btn btn-primary btn-sm">Explore Workouts</Link>
           </div>
         ) : (
@@ -35,7 +36,14 @@ export default function MyPlan() {
             {planList.map((item) => (
               <div key={item.id} className="bg-base-200 border border-base-100/10 rounded-xl p-5 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <img src={item.image || "/placeholder.jpg"} alt={item.name} className="w-16 h-16 rounded-lg object-cover bg-base-300" />
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-base-300">
+                    <Image
+                      src={item.image || "/placeholder.jpg"}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   <div>
                     <h3 className="font-bold text-white">{item.name}</h3>
                     <span className="text-xs text-primary font-medium">{item.category}</span>
@@ -65,7 +73,14 @@ export default function MyPlan() {
             {savedList.map((item) => (
               <div key={item.id} className="bg-base-200 border border-base-100/10 rounded-xl p-5 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <img src={item.image || "/placeholder.jpg"} alt={item.name} className="w-16 h-16 rounded-lg object-cover bg-base-300" />
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-base-300">
+                    <Image
+                      src={item.image || "/placeholder.jpg"}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   <div>
                     <h3 className="font-bold text-white">{item.name}</h3>
                     <span className="text-xs text-secondary font-medium">{item.category}</span>

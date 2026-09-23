@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} bg-[#0e1117] text-white min-h-screen flex flex-col`}>
         <PlanProvider>
           <Navbar />
-          <main className="flex-grow">{children}</main>
+          <main className="grow">{children}</main>
           <Footer />
           <ToastContainer theme="dark" />
         </PlanProvider>

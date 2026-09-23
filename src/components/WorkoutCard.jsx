@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePlan } from "@/context/PlanContext";
 import { FiPlus, FiBookmark, FiEye } from "react-icons/fi";
 
@@ -10,17 +11,18 @@ export default function WorkoutCard({ workout }) {
   return (
     <div className="card bg-base-200 border border-base-100/10 shadow-lg hover:shadow-primary/10 transition-all duration-300 flex flex-col justify-between">
       <figure className="relative h-48 w-full overflow-hidden bg-base-300">
-        <img
+        <Image
           src={workout.image || "/placeholder.jpg"}
           alt={workout.name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+          fill
+          className="object-cover hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute top-3 right-3 badge badge-primary font-semibold">
+        <div className="absolute top-3 right-3 badge badge-primary font-semibold z-10">
           {workout.category}
         </div>
       </figure>
 
-      <div className="card-body p-5 flex-grow flex flex-col justify-between space-y-4">
+      <div className="card-body p-5 grow flex flex-col justify-between space-y-4">
         <div>
           <h2 className="card-title text-xl font-bold text-white mb-2">
             {workout.name}
