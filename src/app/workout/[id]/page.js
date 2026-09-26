@@ -2,176 +2,233 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePlan } from "@/context/PlanContext";
-import { FiCalendar, FiBookmark } from "react-icons/fi";
+import { FiCalendar, FiBookmark, FiStar } from "react-icons/fi";
 
 export default function WorkoutDetails({ params }) {
   const { id } = use(params);
+
   const [workout, setWorkout] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const { addToPlan, saveForLater } = usePlan();
 
   useEffect(() => {
-    fetch(`https://api.abcz.workers.dev/api/fitlog/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const result = data.data || data;
-        setWorkout(result);
+    const getWorkout = async () => {
+      try {
+        const response = await fetch(
+          `https://api.abcz.workers.dev/api/fitlog/${id}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Workout not found");
+        }
+
+        const data = await response.json();
+
+        setWorkout(data);
+      } catch (error) {
+        console.error("Error loading workout:", error);
+        setWorkout(null);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error loading workout details:", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    getWorkout();
   }, [id]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <span className="loading loading-spinner loading-lg text-[#ccff00]"></span>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-white/20 border-t-[#ccff00] rounded-full animate-spin mx-auto mb-4"></div>
+
+          <p className="text-slate-400">
+            Loading workout...
+          </p>
+        </div>
       </div>
     );
   }
 
   if (!workout) {
     return (
-      <div className="text-center py-20 space-y-4">
-        <h2 className="text-2xl font-bold text-white">Workout Not Found</h2>
-        <Link href="/" className="bg-[#ccff00] text-black font-bold px-4 py-2 rounded-lg text-xs uppercase">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-5 px-4">
+        <h2 className="text-2xl font-bold text-white">
+          Workout Not Found
+        </h2>
+
+        <p className="text-slate-400 text-center">
+          The workout you are looking for does not exist.
+        </p>
+
+        <Link
+          href="/"
+          className="bg-[#ccff00] text-black font-bold px-5 py-3 rounded-lg text-sm uppercase"
+        >
           Back to Workouts
         </Link>
       </div>
     );
   }
 
-  // Category list format setup
-  const categories = Array.isArray(workout.category)
-    ? workout.category
-    : typeof workout.category === "string"
-    ? workout.category.split(",").map((c) => c.trim())
-    : ["Chest", "Arms"];
-
-  // Instructions format setup
-  const instructions = Array.isArray(workout.instructions) && workout.instructions.length > 0
-    ? workout.instructions
-    : [
-        "Lie on the bench with eyes under the bar and feet planted.",
-        "Unrack with locked elbows and lower the bar to mid-chest.",
-        "Press up in a slight arc until elbows lock without bouncing.",
-        "Keep shoulder blades pinched and a natural arch in the back."
-      ];
-
   return (
-    <main className="min-h-screen bg-[#0b0d0f] text-slate-200 py-10 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        
-        {/* Left Side: Image Container */}
-        <div className="lg:col-span-6 rounded-3xl overflow-hidden bg-[#121418] border border-white/5 relative aspect-square w-full">
-          <img
-            src={workout.image || workout.img || "/placeholder.jpg"}
-            alt={workout.name || workout.title}
-            className="w-full h-full object-cover"
+    <main className="min-h-screen bg-[#0b0d0f] text-slate-200 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+        <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-[#121418] border border-white/10">
+          <Image
+            src={workout.image}
+            alt={workout.name}
+            fill
+            className="object-cover"
+            priority
           />
         </div>
 
-        {/* Right Side: Content Details */}
-        <div className="lg:col-span-6 space-y-6">
-          
-          {/* Header & Badges */}
-          <div className="space-y-3">
-            <h1 className="text-3xl lg:text-4xl font-extrabold text-white uppercase tracking-tight">
-              {workout.name || workout.title || "BARBELL BENCH PRESS"}
+        <div className="space-y-7">
+          <div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white uppercase tracking-tight">
+              {workout.name}
             </h1>
 
-            <p className="text-xs lg:text-sm text-slate-400 leading-relaxed max-w-lg">
-              {workout.description || workout.desc || "A compound press that builds chest thickness, triceps, and pressing power from a stable bench."}
+            <p className="text-slate-400 mt-4 leading-relaxed">
+              {workout.description}
             </p>
 
-            <div className="flex flex-wrap gap-2 pt-1">
-              {categories.map((cat, idx) => (
-                <Link
-                  key={idx}
-                  href={`/?category=${encodeURIComponent(cat)}`}
-                  className="bg-[#ccff00] hover:bg-[#b8e600] text-black text-[11px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider transition-colors inline-block"
+            <div className="flex flex-wrap gap-2 mt-5">
+              {workout.muscleGroups.map((group) => (
+                <span
+                  key={group}
+                  className="bg-[#ccff00] text-black text-xs font-black px-3 py-1.5 rounded-full uppercase"
                 >
-                  {cat}
-                </Link>
+                  {group}
+                </span>
               ))}
             </div>
           </div>
 
-          {/* Stats Grid Box */}
-          <div className="bg-[#121418] border border-white/5 rounded-2xl p-6 space-y-3.5 text-xs">
-            <div className="flex justify-between items-center text-slate-400">
-              <span className="uppercase font-bold tracking-wider text-[10px] text-slate-400">EQUIPMENT</span>
-              <span className="text-slate-200 font-medium">{workout.equipment || "Barbell, Bench"}</span>
-            </div>
+          <div className="bg-[#121418] border border-white/10 rounded-2xl p-5 sm:p-6">
+            <h2 className="text-sm font-black text-white uppercase tracking-wider mb-5">
+              KEY SPECS
+            </h2>
 
-            <div className="flex justify-between items-center text-slate-400">
-              <span className="uppercase font-bold tracking-wider text-[10px] text-slate-400">DIFFICULTY</span>
-              <span className="text-slate-200 font-medium">{workout.difficulty || "Intermediate"}</span>
-            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between gap-4 border-b border-white/5 pb-3">
+                <span className="text-xs text-slate-500 font-bold uppercase">
+                  Equipment
+                </span>
 
-            <div className="flex justify-between items-center text-slate-400">
-              <span className="uppercase font-bold tracking-wider text-[10px] text-slate-400">SETS</span>
-              <span className="text-slate-200 font-medium">{workout.sets || "4"}</span>
-            </div>
+                <span className="text-sm text-slate-200 text-right">
+                  {workout.equipment}
+                </span>
+              </div>
 
-            <div className="flex justify-between items-center text-slate-400">
-              <span className="uppercase font-bold tracking-wider text-[10px] text-slate-400">REPS</span>
-              <span className="text-slate-200 font-medium">{workout.reps || "6-8"}</span>
-            </div>
+              <div className="flex justify-between gap-4 border-b border-white/5 pb-3">
+                <span className="text-xs text-slate-500 font-bold uppercase">
+                  Difficulty
+                </span>
 
-            <div className="flex justify-between items-center text-slate-400">
-              <span className="uppercase font-bold tracking-wider text-[10px] text-slate-400">DURATION</span>
-              <span className="text-slate-200 font-medium">{workout.duration || "25 min"}</span>
-            </div>
+                <span className="text-sm text-slate-200">
+                  {workout.difficulty}
+                </span>
+              </div>
 
-            <div className="flex justify-between items-center text-slate-400">
-              <span className="uppercase font-bold tracking-wider text-[10px] text-slate-400">CALORIES</span>
-              <span className="text-slate-200 font-medium">{workout.calories || "180 kcal"}</span>
-            </div>
+              <div className="flex justify-between gap-4 border-b border-white/5 pb-3">
+                <span className="text-xs text-slate-500 font-bold uppercase">
+                  Sets
+                </span>
 
-            <div className="flex justify-between items-center text-slate-400">
-              <span className="uppercase font-bold tracking-wider text-[10px] text-slate-400">RATING</span>
-              <span className="text-slate-200 font-medium">{workout.rating || "4.8"}</span>
+                <span className="text-sm text-slate-200">
+                  {workout.sets}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4 border-b border-white/5 pb-3">
+                <span className="text-xs text-slate-500 font-bold uppercase">
+                  Reps
+                </span>
+
+                <span className="text-sm text-slate-200">
+                  {workout.reps}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4 border-b border-white/5 pb-3">
+                <span className="text-xs text-slate-500 font-bold uppercase">
+                  Duration
+                </span>
+
+                <span className="text-sm text-slate-200">
+                  {workout.duration} min
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-4 border-b border-white/5 pb-3">
+                <span className="text-xs text-slate-500 font-bold uppercase">
+                  Calories
+                </span>
+
+                <span className="text-sm text-slate-200">
+                  {workout.caloriesBurned} kcal
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center gap-4">
+                <span className="text-xs text-slate-500 font-bold uppercase">
+                  Rating
+                </span>
+
+                <span className="flex items-center gap-1.5 text-sm text-slate-200">
+                  <FiStar className="text-[#ccff00]" />
+                  {workout.rating}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Instructions List */}
-          <div className="space-y-3 pt-2">
-            <h2 className="text-xs font-black text-white uppercase tracking-wider">
+          <div>
+            <h2 className="text-sm font-black text-white uppercase tracking-wider mb-4">
               INSTRUCTIONS
             </h2>
 
-            <ol className="space-y-2.5 text-xs text-slate-400 list-decimal list-inside leading-relaxed">
-              {instructions.map((step, idx) => (
-                <li key={idx} className="pl-1">
-                  <span>{step}</span>
+            <ol className="space-y-4">
+              {workout.instructions.map((step, index) => (
+                <li
+                  key={index}
+                  className="flex gap-3 text-sm text-slate-400 leading-relaxed"
+                >
+                  <span className="shrink-0 w-7 h-7 rounded-full bg-[#ccff00] text-black flex items-center justify-center font-black text-xs">
+                    {index + 1}
+                  </span>
+
+                  <span className="pt-1">
+                    {step}
+                  </span>
                 </li>
               ))}
             </ol>
           </div>
 
-          {/* Bottom Action Buttons */}
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               onClick={() => addToPlan(workout)}
-              className="bg-[#ccff00] hover:bg-[#b8e600] text-black font-extrabold px-5 py-3 rounded-xl text-xs uppercase flex items-center justify-center gap-2 transition-colors"
+              className="flex-1 bg-[#ccff00] hover:bg-[#b8e600] text-black font-black px-5 py-3.5 rounded-xl text-sm uppercase flex items-center justify-center gap-2 transition-colors"
             >
-              <FiCalendar className="text-sm" /> Add to today&apos;s plan
+              <FiCalendar />
+              Add to today&apos;s plan
             </button>
 
             <button
               onClick={() => saveForLater(workout)}
-              className="px-5 py-3 bg-transparent hover:bg-white/5 border border-white/10 text-slate-300 rounded-xl text-xs font-bold uppercase flex items-center justify-center gap-2 transition-colors"
+              className="flex-1 px-5 py-3.5 bg-transparent hover:bg-white/5 border border-white/15 text-slate-300 rounded-xl text-sm font-bold uppercase flex items-center justify-center gap-2 transition-colors"
             >
-              <FiBookmark className="text-sm" /> Save for later
+              <FiBookmark />
+              Save for later
             </button>
           </div>
-
         </div>
-
       </div>
     </main>
   );

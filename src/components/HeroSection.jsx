@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { FiArrowDownRight } from "react-icons/fi";
 
 export default function HeroSection() {
   return (
@@ -8,25 +10,30 @@ export default function HeroSection() {
           <span className="text-[#ccff00] text-xs font-extrabold tracking-widest uppercase">
             WORKOUT LIBRARY
           </span>
-          
+
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none uppercase tracking-tight">
             TRAIN WITH INTENT. LOG EVERY SET.
           </h1>
-          
+
           <p className="text-slate-400 text-sm md:text-base leading-relaxed">
-            FitLog is a dark, no-nonsense gym companion: pick a lift, lock it into today&apos;s plan, and watch the week&apos;s work add up.
+            FitLog is a dark, no-nonsense gym companion: pick a lift, lock it
+            into today&apos;s plan, and watch the week&apos;s work add up.
           </p>
-          
+
           <div>
-            <button className="bg-[#ccff00] hover:bg-[#b8e600] text-black font-black px-6 py-3 rounded-lg transition-colors uppercase text-xs tracking-wider">
+            <Link
+              href="#library"
+              className="inline-flex items-center gap-2 bg-[#ccff00] hover:bg-[#b8e600] text-black font-black px-6 py-3 rounded-lg transition-colors uppercase text-xs tracking-wider"
+            >
               BROWSE WORKOUTS
-            </button>
+              <FiArrowDownRight />
+            </Link>
           </div>
         </div>
 
         <div className="relative w-full max-w-sm h-64 md:h-80 flex justify-center items-center">
           <Image
-            src="/banner.png" 
+            src="/banner.png"
             alt="Workout Banner"
             fill
             className="object-contain"
